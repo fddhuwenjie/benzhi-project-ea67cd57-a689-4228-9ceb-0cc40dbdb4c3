@@ -115,6 +115,9 @@ func (s *Store) UpdateContext(ctx context.Context, fn func(*Data) error) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	next, e := clone(s.d)
 	if e != nil {
 		return e

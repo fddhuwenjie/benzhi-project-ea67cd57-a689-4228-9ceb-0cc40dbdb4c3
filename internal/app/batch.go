@@ -125,6 +125,9 @@ func (s *Service) ImportBatchContext(ctx context.Context, c BatchPointsCommand) 
 	}
 	unlock := s.lock(c.JobID)
 	defer unlock()
+	if err := ctx.Err(); err != nil {
+		return Result{}, err
+	}
 	var out Result
 	err := s.store.UpdateContext(ctx, func(d *store.Data) error {
 		if r, ok, err := replay(d, c.RequestID, c); ok || err != nil {

@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -32,6 +33,8 @@ func problem(w http.ResponseWriter, status int, code, msg string) {
 }
 func appError(w http.ResponseWriter, e error) {
 	switch {
+	case errors.Is(e, context.Canceled) || errors.Is(e, context.DeadlineExceeded):
+		problem(w, 499, "request_canceled", "请求已取消或超时")
 	case errors.Is(e, domain.ErrNotFound):
 		problem(w, 404, "not_found", "任务或记录不存在")
 	case errors.Is(e, domain.ErrConflict):
