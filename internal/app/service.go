@@ -60,7 +60,12 @@ func replay(d *store.Data, id string, cmd any) (Result, bool, error) {
 	}
 	out, concrete := r.Response.(Result)
 	if !concrete {
-		return Result{}, true, nil
+		// Reloading the store from disk decodes the saved Response into a
+		// generic map[string]any rather than a Result value, so re-materialise
+		// the original response to serve replays after a restart.
+		if b, err := json.Marshal(r.Response); err == nil {
+			_ = json.Unmarshal(b, &out)
+		}
 	}
 	out.Replayed = true
 	return out, true, nil
