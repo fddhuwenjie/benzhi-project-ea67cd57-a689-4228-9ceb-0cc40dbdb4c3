@@ -95,21 +95,14 @@ func (s *Store) persist(d Data) error {
 	return os.Rename(tmp, s.path)
 }
 func clone(d Data) (Data, error) {
-	b, e := json.Marshal(d.Requests)
+	b, e := json.Marshal(d)
 	if e != nil {
 		return Data{}, e
 	}
-	requests := map[string]Request{}
-	if e = json.Unmarshal(b, &requests); e != nil {
+	var out Data
+	if e = json.Unmarshal(b, &out); e != nil {
 		return Data{}, e
 	}
-	out := d
-	out.Jobs = make(map[string]domain.RegistrationJob, len(d.Jobs))
-	for id, job := range d.Jobs {
-		out.Jobs[id] = job
-	}
-	out.Requests = requests
-	out.Events = append([]domain.AuditEvent(nil), d.Events...)
 	return out, nil
 }
 func (s *Store) Snapshot() Data { s.mu.RLock(); defer s.mu.RUnlock(); out, _ := clone(s.d); return out }
