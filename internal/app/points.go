@@ -137,7 +137,7 @@ func (s *Service) ReplacePoint(c ReplacePointCommand) (Result, error) {
 		d.Remediations[c.JobID] = append(d.Remediations[c.JobID], domain.Remediation{RemediationID: stableID("remediation", c.RequestID), JobID: c.JobID, ItemID: itemID, OldPointID: c.OldPointID, NewPointID: c.NewPointID, Reason: c.Reason, ReplacementEvidence: c.EvidenceNote, ActorID: c.ActorID, CreatedAt: s.now()})
 		items := d.RemediationItems[c.JobID]
 		for i := range items {
-			if items[i].Status != "closed" {
+			if items[i].ItemID == itemID && items[i].Status != "closed" {
 				items[i].ReplacementPointID = c.NewPointID
 				items[i].UpdatedAt = s.now()
 			}
@@ -145,7 +145,7 @@ func (s *Service) ReplacePoint(c ReplacePointCommand) (Result, error) {
 		d.RemediationItems[c.JobID] = items
 		instructions := d.ReturnInstructions[c.JobID]
 		for i := range instructions {
-			if instructions[i].Status == "open" {
+			if instructions[i].PointID == c.OldPointID && instructions[i].Status == "open" {
 				instructions[i].Status = "addressed"
 			}
 		}
