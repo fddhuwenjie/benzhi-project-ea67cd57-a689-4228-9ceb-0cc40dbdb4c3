@@ -18,10 +18,10 @@ var reviewSampleCache sync.Map
 func Sample(points []domain.ControlPoint, seed string) []string {
 	key := seed + "\x00" + domain.ControlSetDigest(points)
 	if cached, ok := reviewSampleCache.Load(key); ok {
-		return cached.([]string)
+		return append([]string(nil), cached.([]string)...)
 	}
 	out := calculateSample(points, seed)
-	reviewSampleCache.Store(key, out)
+	reviewSampleCache.Store(key, append([]string(nil), out...))
 	return out
 }
 
