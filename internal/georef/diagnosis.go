@@ -25,8 +25,6 @@ type ReadinessDiagnosis struct {
 	Rules            []DiagnosticRule `json:"rules"`
 }
 
-var quadrantWorkspace [4]int
-
 func Diagnose(job domain.RegistrationJob, points []domain.ControlPoint) ReadinessDiagnosis {
 	d := ReadinessDiagnosis{Revision: job.Revision, MinimumRequired: 4}
 	active := domain.ActivePoints(points)
@@ -36,9 +34,7 @@ func Diagnose(job domain.RegistrationJob, points []domain.ControlPoint) Readines
 		d.MinimumShortfall = d.MinimumRequired - d.Active
 		d.Rules = append(d.Rules, DiagnosticRule{"minimum_count", "有效控制点数量不足", nil, true})
 	}
-	for i := range quadrantWorkspace {
-		quadrantWorkspace[i] = 0
-	}
+	quadrantWorkspace := [4]int{}
 	for _, p := range active {
 		q := quadrant(job, p)
 		quadrantWorkspace[q]++
